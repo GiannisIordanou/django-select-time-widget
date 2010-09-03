@@ -156,17 +156,26 @@ class SelectTimeWidget(Widget):
     id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
-        h = data.get(self.hour_field % name, '')
-        m = data.get(self.minute_field % name, '')
-        s = data.get(self.second_field % name, '')
+        h = data.get(self.hour_field % name)
+        m = data.get(self.minute_field % name)
+        s = data.get(self.second_field % name)
 
-        if h == m == s == '':
-            return None
-
-        try:
-            h, m, s = int(h or 0), int(m or 0), int(s or 0)
-        except ValueError:
+        # If no h:m:s fields are supplied, fall back to the original time field.
+        if h is None and m is None and s is None:
             return data.get(name, None)
+
+        # If any h:m:s fields are supplied, default any empty values to zero.
+        if h or m or s:
+            try:
+                h, m, s = int(h or 0), int(m or 0), int(s or 0)
+            except ValueError:
+                # Garbage in h:m:s fields; fall back to original time field.
+                # Not sure if this is the right thing to do, but this seems
+                # to match the behavior of SelectDateWidget.
+                return data.get(name, None)
+        else:
+            # All empty: field is blank.
+            return None
 
         meridiem = data.get(self.meridiem_field % name, '')
 
