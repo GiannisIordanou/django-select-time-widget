@@ -143,8 +143,6 @@ class SelectTimeWidget(Widget):
     
         if self.twelve_hr:
             meridiem_choices = [('a.m.','a.m.'), ('p.m.','p.m.')]
-            if not self.required:
-                meridiem_choices.insert(0, self.none_value)
             local_attrs['id'] = local_attrs['id'] = self.meridiem_field % id_
             select_html = Select(choices=meridiem_choices).render(self.meridiem_field % name, meridiem_val, local_attrs)
             output.append(select_html)
